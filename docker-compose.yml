@@ -10,6 +10,30 @@ services:
     volumes:
       - pgdata:/var/lib/postgresql/data
 
+  es01:
+    image: docker.elastic.co/elasticsearch/elasticsearch:7.10.1
+    environment:
+      - node.name=es01
+      - cluster.name=es-docker-cluster
+      - discovery.seed_hosts=es02
+      - cluster.initial_master_nodes=es01,es02
+      - "ES_JAVA_OPTS=-Xms512m -Xmx512m"
+    volumes:
+      - elasticdata01:/usr/share/elasticsearch/data
+    ports:
+      - 9200:9200
+
+  es02:
+    image: docker.elastic.co/elasticsearch/elasticsearch:7.10.1
+    environment:
+      - node.name=es02
+      - cluster.name=es-docker-cluster
+      - discovery.seed_hosts=es02
+      - cluster.initial_master_nodes=es01,es02
+      - "ES_JAVA_OPTS=-Xms512m -Xmx512m"
+    volumes:
+      - elasticdata02:/usr/share/elasticsearch/data
+
   api:
     build: ./kanji_benkyou_api
     user: "${UID}:${GID}"
@@ -23,3 +47,5 @@ services:
 
 volumes:
   pgdata:
+  elasticdata01:
+  elasticdata02:
