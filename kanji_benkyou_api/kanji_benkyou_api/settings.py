@@ -9,23 +9,29 @@ https://docs.djangoproject.com/en/3.1/topics/settings/
 For the full list of settings and their values, see
 https://docs.djangoproject.com/en/3.1/ref/settings/
 """
-
+import environ
 from pathlib import Path
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
+env = environ.Env(
+    DEBUG=(bool, False),
+    ALLOWED_HOSTS=(list, [])
+)
+
+env.read_env()
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/3.1/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = '$rm(il51#7w4#*_#_=c3(zerr!9q+bujdbjva#b1s@383i0ob$'
+SECRET_KEY = env('SECRET_KEY') 
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = env.bool('DEBUG')
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = env('ALLOWED_HOSTS')
 
 
 # Application definition
@@ -85,14 +91,7 @@ WSGI_APPLICATION = 'kanji_benkyou_api.wsgi.application'
 # https://docs.djangoproject.com/en/3.1/ref/settings/#databases
 
 DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.postgresql',
-        'NAME': 'kanjibenkyou_db',
-        'USER': 'kanjibenkyou',
-        'PASSWORD': 's3cr3t!',
-        'HOST': 'db',
-        'PORT': 5432,
-    }
+    'default': env.db() 
 }
 
 
@@ -137,6 +136,7 @@ REST_FRAMEWORK = {
 }
 
 AUTHENTICATION_BACKENDS = (
+    'social_core.backends.google.GoogleOAuth2',
     'drf_social_oauth2.backends.DjangoOAuth2',
     'django.contrib.auth.backends.ModelBackend',
 )
@@ -146,3 +146,8 @@ AUTHENTICATION_BACKENDS = (
 # https://docs.djangoproject.com/en/3.1/howto/static-files/
 
 STATIC_URL = '/static/'
+
+# OAuth
+SOCIAL_AUTH_GOOGLE_OAUTH2_KEY=env.str('SOCIAL_AUTH_GOOGLE_OAUTH2_KEY')
+SOCIAL_AUTH_GOOGLE_OAUTH2_SECRET=env.str('SOCIAL_AUTH_GOOGLE_OAUTH2_SECRET')
+SOCIAL_AUTH_GOOGLE_OAUTH2_SCOPE=env.list('SOCIAL_AUTH_GOOGLE_OAUTH2_SCOPE')

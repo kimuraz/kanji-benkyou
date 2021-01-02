@@ -37,6 +37,8 @@ services:
   api:
     build: ./kanji_benkyou_api
     user: "${UID}:${GID}"
+    env_file:
+      - ./kanji_benkyou_api/.env
     volumes:
       - ./kanji_benkyou_api:/opt/kanji-api:rw
     ports:
