@@ -47,6 +47,14 @@ services:
       - db
     command: ["python", "manage.py", "runserver",  "0.0.0.0:8000"]
 
+  app:
+    build: ./kanji-benkyou
+    volumes:
+      - ./kanji-benkyou:/opt/kanji-app:rw
+    ports:
+      - "8080:8080"
+    command: ["yarn", "serve"]
+
 volumes:
   pgdata:
   elasticdata01:
