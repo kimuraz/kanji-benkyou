@@ -1,8 +1,13 @@
 <template>
-  <a-row>
+  <a-row justify="center" :style="{ marginTop: '10vh'}">
     <a-col :sm="10" :md="8" :lg="6">
       <a-card class="login-card">
-        <img src="@/assets/btn_google_signin.png" @click="gLogin" />
+        <h2>Login</h2>
+        <a-row>
+          <a-col :sm="12" :md="6">
+            <img src="@/assets/btn_google_signin.png" @click="gLogin" />
+          </a-col>
+        </a-row>
       </a-card>
     </a-col>
   </a-row>

@@ -16,7 +16,7 @@ export default {
   },
   setup(props) {
     const COLORS = ['purple', 'blue', 'cyan', 'green', 'lime'];
-    const color = computed(() => COLORS[props.level + 1]);
+    const color = computed(() => COLORS[props.level - 1]);
 
     return {
       color,
@@ -25,7 +25,7 @@ export default {
 };
 </script>
 
-<style lang="sass">
+<style lang="scss">
 .jlpt-level {
   font-size: 1rem;
 }

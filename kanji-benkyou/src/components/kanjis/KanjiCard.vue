@@ -5,6 +5,7 @@
     </template>
 
     <div class="data">
+      <jlpt-badge v-if="kanji.jlpt" :level="kanji.jlpt" />
       <div>
         <a-tag color="gold">grade: </a-tag>
         <a-tag>{{ kanji.grade || '-' }}</a-tag>
@@ -40,8 +41,13 @@
 </template>
 
 <script>
+import JlptBadge from './JlptBadge';
+
 export default {
   name: 'KanjiCard',
+  components: {
+    JlptBadge,
+  },
   props: {
     kanji: {
       type: Object,
@@ -56,8 +62,9 @@ export default {
   margin: 10px;
   width: 29vw;
   h1 {
-    font-size: 4rem;
+    font-size: 5rem;
     text-align: center;
+    margin: 0;
   }
   .data {
     > div {

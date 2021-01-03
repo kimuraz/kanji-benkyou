@@ -5,7 +5,7 @@
         <a-input-search
           size="large"
           v-model:value="state.q"
-          @search="search"
+          @search="search()"
           placeholder="Search for a kanji"
         />
       </a-col>
@@ -25,7 +25,7 @@
 </template>
 
 <script>
-import { reactive } from 'vue';
+import { reactive, watch } from 'vue';
 import { notification } from 'ant-design-vue';
 
 import api from '@/api';
@@ -40,14 +40,18 @@ export default {
   setup() {
     const state = reactive({
       q: '',
+      page: 0,
       loading: false,
       results: [],
     });
 
-    const search = async () => {
+    const search = async (page = 0) => {
       try {
         state.loading = true;
-        const { data } = await api.get(`/kanjis/search?q=${state.q}`);
+        state.results = [];
+        const { data } = await api.get(
+          `/kanjis/search?q=${state.q}&page=${page}`
+        );
         state.results = data.results.map((k) => ({ id: k._id, ...k._source }));
       } catch (error) {
         if (error.response?.status !== 404) {
@@ -63,6 +67,13 @@ export default {
       }
     };
 
+    watch(
+      () => state.page,
+      () => {
+        search();
+      }
+    );
+
     return { state, search };
   },
 };
@@ -70,10 +81,15 @@ export default {
 
 <style lang="scss">
 #home {
-   padding: 20px;
-   height: 100%;
-   min-height: 100%;
+  padding: 20px;
+  height: 100%;
+  min-height: 100%;
 }
+
+.results {
+  margin-top: 20px;
+}
+
 .loading-empty {
   width: 100%;
   margin: 20px;
@@ -82,5 +98,7 @@ export default {
 .cards-content {
   display: flex;
   flex-wrap: wrap;
+  justify-content: space-around;
+  align-items: strech;
 }
 </style>
