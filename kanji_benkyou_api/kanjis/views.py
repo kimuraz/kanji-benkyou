@@ -1,3 +1,4 @@
+import html
 from django.shortcuts import render
 from django.conf import settings
 
@@ -19,6 +20,11 @@ def search_kanji(request):
     search_param = {
         'from': PAGE_SIZE * (int(page) if page.isdecimal() else 0),
         'size': PAGE_SIZE,
+        'sort': [
+            'grade',
+            { 'stroke_count': { 'order': 'asc' } },
+            'jlpt',
+        ],
         'query': {}
     }
 
@@ -27,14 +33,14 @@ def search_kanji(request):
         search_param['query']['match'] = data
     elif request.method == 'GET':
         query = request.query_params.get('q', '')
+        query = html.unescape(query)
         search_param['query']['query_string'] = {
-            'query': query,
-            'default_field': 'meanings',
+            'query': query if query else '*',
         }
 
-    results = es.search(index='kanjis', body=search_param, filter_path=['hits.hits.*']).get('hits', {'hits': []})['hits']
+    results = es.search(index='kanjis', body=search_param, filter_path=['hits.total', 'hits.hits._id', 'hits.hits._source']).get('hits', {'hits': []})
 
     if len(results) == 0:
         return Response(status=status.HTTP_404_NOT_FOUND)
 
-    return Response({ 'results': results }, status=status.HTTP_200_OK)
+    return Response({ 'results': results.get('hits', []), 'total': results['total']['value'] }, status=status.HTTP_200_OK)
