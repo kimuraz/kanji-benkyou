@@ -16,9 +16,11 @@ Including another URLconf
 from django.contrib import admin
 from django.urls import path, include
 from kanjis import views as kanji_views
+from quiz.urls import router as quiz_router
 
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('auth/', include('drf_social_oauth2.urls', namespace='drf')),
     path('kanjis/search', kanji_views.search_kanji), 
+    path('', include(quiz_router.urls)),
 ]

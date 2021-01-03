@@ -59,6 +59,7 @@ INSTALLED_APPS = [
 
     # local apps
     'kanjis',
+    'quiz',
 ]
 
 MIDDLEWARE = [

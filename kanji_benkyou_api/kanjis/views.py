@@ -21,6 +21,7 @@ def search_kanji(request):
         'from': PAGE_SIZE * (int(page) if page.isdecimal() else 0),
         'size': PAGE_SIZE,
         'sort': [
+            '_score',
             'grade',
             { 'stroke_count': { 'order': 'asc' } },
             'jlpt',

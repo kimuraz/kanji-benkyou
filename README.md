@@ -8,9 +8,10 @@ It uses the data from [kanjiapi.dev](https://kanjiapi.dev/)
 General:
 - [ ] Searching / filtering
 - [ ] PDF sheet generation
+- [ ] Translations
 
 Per user:
-- [ ] Bookmark (Flashcards)
+- [ ] Flashcards/Decks
 - [ ] Keep track
 - [ ] Review
 - [ ] Quiz 
