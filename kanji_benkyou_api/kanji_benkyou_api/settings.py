@@ -56,6 +56,9 @@ INSTALLED_APPS = [
     'oauth2_provider',
     'social_django',
     'drf_social_oauth2',
+
+    # local apps
+    'kanjis',
 ]
 
 MIDDLEWARE = [
@@ -157,3 +160,6 @@ STATIC_URL = '/static/'
 SOCIAL_AUTH_GOOGLE_OAUTH2_KEY=env.str('SOCIAL_AUTH_GOOGLE_OAUTH2_KEY')
 SOCIAL_AUTH_GOOGLE_OAUTH2_SECRET=env.str('SOCIAL_AUTH_GOOGLE_OAUTH2_SECRET')
 SOCIAL_AUTH_GOOGLE_OAUTH2_SCOPE=env.list('SOCIAL_AUTH_GOOGLE_OAUTH2_SCOPE')
+
+# Elastic
+ELASTIC_HOST=env('ELASTIC_HOST')
