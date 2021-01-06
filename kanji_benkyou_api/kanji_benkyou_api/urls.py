@@ -21,6 +21,7 @@ from quiz.urls import router as quiz_router
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('auth/', include('drf_social_oauth2.urls', namespace='drf')),
-    path('kanjis/search', kanji_views.search_kanji), 
+    path('kanjis/search/', kanji_views.search_kanji), 
+    path('romaji_to_kana/', kanji_views.romaji_to_kana),
     path('', include(quiz_router.urls)),
 ]

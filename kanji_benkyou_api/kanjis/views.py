@@ -2,6 +2,8 @@ import html
 from django.shortcuts import render
 from django.conf import settings
 
+import romkan
+
 from elasticsearch import Elasticsearch
 
 from rest_framework import status
@@ -45,3 +47,11 @@ def search_kanji(request):
         return Response(status=status.HTTP_404_NOT_FOUND)
 
     return Response({ 'results': results.get('hits', []), 'total': results['total']['value'] }, status=status.HTTP_200_OK)
+
+@api_view(['GET'])
+def romaji_to_kana(request):
+    """
+    Converts romaji in either katakana or hiragana.
+    """
+    word = request.query_params.get('word', '')[0:1000]
+    return Response({ 'hiragana': romkan.to_hiragana(word), 'katakana': romkan.to_katakana(word) }, status=status.HTTP_200_OK)
