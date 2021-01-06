@@ -6,6 +6,7 @@ from quiz.models import Deck, Flashcard, Quiz
 
 class DeckSerializer(serializers.ModelSerializer):
     user = serializers.HiddenField(default=CurrentUserDefault())
+    ext_list = serializers.ReadOnlyField()
     class Meta:
         model = Deck
         fields = '__all__' 

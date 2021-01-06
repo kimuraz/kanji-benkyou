@@ -8,11 +8,15 @@ class Deck(models.Model):
     name = models.CharField(max_length=100, null=False, blank=False)
     description = models.TextField(null=True, blank=True)
 
+    @property
+    def kanjis(self):
+        return self.cards.values_list('char', flat=True)
+
 
 class Flashcard(models.Model):
-    deck = models.ForeignKey(Deck, null=False, on_delete=models.CASCADE)
+    deck = models.ForeignKey(Deck, null=False, on_delete=models.CASCADE, related_name='cards')
     kanji = models.JSONField(null=False, blank=False)
-    elastic_id = models.CharField(max_length=100, null=False, blank=False)
+    char = models.CharField(max_length=5, null=False, blank=False) # FIXME: Fix it to use the kanji inside the JSONField, check dev property
 
 
 class Quiz(models.Model):
