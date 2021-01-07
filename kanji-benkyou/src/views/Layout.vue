@@ -15,7 +15,7 @@
         </a-menu-item>
 
         <a-menu-item key="Decks" v-if="user.token">
-          <router-link :to="{ name: 'Login' }">
+          <router-link :to="{ name: 'Decks' }">
             <book-outlined />
             Decks
           </router-link>
