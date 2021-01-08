@@ -100,7 +100,7 @@ const store = createStore({
             client_id: process.env.VUE_APP_DJANGO_GOOGLE_APP_ID,
             client_secret: process.env.VUE_APP_DJANGO_GOOGLE_APP_SECRET,
             backend: 'google-oauth2',
-            token: gRes.xc.access_token,
+            token: Object.values(gRes).find(v => !!v.access_token).access_token,
           });
 
           context.dispatch('getDecks');
