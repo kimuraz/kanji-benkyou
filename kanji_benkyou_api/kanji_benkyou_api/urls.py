@@ -24,5 +24,6 @@ urlpatterns = [
     path('kanjis/search/', kanji_views.search_kanji), 
     path('romaji_to_kana/', kanji_views.romaji_to_kana),
     path('kanji_order/', kanji_views.kanji_order),
+    path('kanji_by_jlpt/', kanji_views.kanji_by_jlpt),
     path('', include(quiz_router.urls)),
 ]

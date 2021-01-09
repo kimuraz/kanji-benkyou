@@ -15,13 +15,14 @@ from rest_framework.response import Response
 
 logger = logging.getLogger(__name__)
 
+PAGE_SIZE = 50
+
 @api_view(['GET', 'POST'])
 def search_kanji(request):
     """
     Search for kanjis on elasticsearch.
     """
     es = Elasticsearch([settings.ELASTIC_HOST])
-    PAGE_SIZE = 50
     page = request.query_params.get('page', '0') 
     search_param = {
         'from': PAGE_SIZE * (int(page) if page.isdecimal() else 0),
@@ -83,3 +84,32 @@ def kanji_order(request):
     except Exception as e:
         logger.error(e)
         return Response({ 'error': str(e) }, status=status.HTTP_404_NOT_FOUND)
+
+@api_view(['GET'])
+def kanji_by_jlpt(request):
+    """
+    Retrieve kanjis by JLPT level
+    """
+    es = Elasticsearch([settings.ELASTIC_HOST])
+    page = request.query_params.get('page', '0') 
+    jlpt = request.query_params.get('jlpt', '4')
+    search_param = {
+        'from': PAGE_SIZE * (int(page) if page.isdecimal() else 0),
+        'size': PAGE_SIZE,
+        'sort': [
+            '_score',
+            { 'stroke_count': { 'order': 'asc' } },
+        ],
+        'query': {
+            'match': {
+                'jlpt': (int(jlpt) if jlpt.isdecimal() else 4)
+            }
+        }
+    }
+
+    results = es.search(index='kanjis', body=search_param, filter_path=['hits.total', 'hits.hits._id', 'hits.hits._source']).get('hits', {'hits': []})
+
+    if len(results) == 0:
+        return Response(status=status.HTTP_404_NOT_FOUND)
+
+    return Response({ 'results': results.get('hits', []), 'total': results['total']['value'] }, status=status.HTTP_200_OK)
