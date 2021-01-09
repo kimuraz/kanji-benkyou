@@ -6,7 +6,7 @@
     :closable="false"
   >
     <div style="text-align: center">
-      <img v-if="kanjiImg" :src="kanjiImg" />
+      <img v-if="kanjiImg" :src="kanjiImg" style="height: 28vh;"/>
       <a-alert
         v-if="error"
         :message="error"
