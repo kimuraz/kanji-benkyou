@@ -1,0 +1,3 @@
+[submodule "kanji_benkyou_api/kanjis/kanjivg"]
+	path = kanji_benkyou_api/kanjis/kanjivg
+	url = git@github.com:KanjiVG/kanjivg.git

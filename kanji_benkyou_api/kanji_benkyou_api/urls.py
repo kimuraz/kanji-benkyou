@@ -23,5 +23,6 @@ urlpatterns = [
     path('auth/', include('drf_social_oauth2.urls', namespace='drf')),
     path('kanjis/search/', kanji_views.search_kanji), 
     path('romaji_to_kana/', kanji_views.romaji_to_kana),
+    path('kanji_order/', kanji_views.kanji_order),
     path('', include(quiz_router.urls)),
 ]

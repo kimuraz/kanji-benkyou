@@ -7,12 +7,16 @@
     <div class="data">
       <jlpt-badge v-if="kanji.jlpt" :level="kanji.jlpt" />
       <div>
-        <a-tag color="gold">grade: </a-tag>
+        <a-tag color="gold">Grade: </a-tag>
         <a-tag>{{ kanji.grade || '-' }}</a-tag>
       </div>
       <div>
         <a-tag color="geekblue">Strokes: </a-tag>
         <a-tag>{{ kanji.stroke_count }}</a-tag>
+        <info-circle-outlined
+          :style="{ cursor: 'pointer' }"
+          @click="showOrder = true"
+        />
       </div>
       <div>
         <a-tag color="pink"> 訓(くん):</a-tag>
@@ -38,21 +42,34 @@
       </div>
     </div>
   </a-card>
+  <order-modal
+    v-if="showOrder"
+    :visible="showOrder"
+    :kanji="kanji"
+    @close="showOrder = false"
+  />
 </template>
 
 <script>
+import { ref } from 'vue';
 import JlptBadge from './JlptBadge';
+import { InfoCircleOutlined } from '@ant-design/icons-vue';
+import OrderModal from './OrderModal';
 
 export default {
   name: 'KanjiCard',
   components: {
     JlptBadge,
+    InfoCircleOutlined,
+    OrderModal,
   },
   props: {
-    kanji: {
-      type: Object,
-      required: true,
-    },
+    kanji: Object,
+  },
+  setup() {
+    const showOrder = ref(false);
+
+    return { showOrder };
   },
 };
 </script>
