@@ -23,9 +23,9 @@ def search_kanji(request):
     Search for kanjis on elasticsearch.
     """
     es = Elasticsearch([settings.ELASTIC_HOST])
-    page = request.query_params.get('page', '0') 
+    page = request.query_params.get('page', '1') 
     search_param = {
-        'from': PAGE_SIZE * (int(page) if page.isdecimal() else 0),
+        'from': PAGE_SIZE * (int(page) - 1 if page.isdecimal() and int(page) >= 1 else 1),
         'size': PAGE_SIZE,
         'sort': [
             '_score',
@@ -51,7 +51,8 @@ def search_kanji(request):
     if len(results) == 0:
         return Response(status=status.HTTP_404_NOT_FOUND)
 
-    return Response({ 'results': results.get('hits', []), 'total': results['total']['value'] }, status=status.HTTP_200_OK)
+    return Response({ 'results': results.get('hits', []), 'total': results['total']['value'], 'page_size': PAGE_SIZE }, status=status.HTTP_200_OK)
+
 
 @api_view(['GET'])
 def romaji_to_kana(request):
@@ -91,10 +92,10 @@ def kanji_by_jlpt(request):
     Retrieve kanjis by JLPT level
     """
     es = Elasticsearch([settings.ELASTIC_HOST])
-    page = request.query_params.get('page', '0') 
-    jlpt = request.query_params.get('jlpt', '4')
+    page = request.query_params.get('page', '1') 
+    jlpt = request.query_params.get('jlpt', '5')
     search_param = {
-        'from': PAGE_SIZE * (int(page) if page.isdecimal() else 0),
+        'from': PAGE_SIZE * (int(page) - 1 if page.isdecimal() and int(page) >= 1 else 1),
         'size': PAGE_SIZE,
         'sort': [
             '_score',
@@ -102,7 +103,7 @@ def kanji_by_jlpt(request):
         ],
         'query': {
             'match': {
-                'jlpt': (int(jlpt) if jlpt.isdecimal() else 4)
+                'jlpt': (int(jlpt) if jlpt.isdecimal() else 5)
             }
         }
     }
@@ -112,4 +113,4 @@ def kanji_by_jlpt(request):
     if len(results) == 0:
         return Response(status=status.HTTP_404_NOT_FOUND)
 
-    return Response({ 'results': results.get('hits', []), 'total': results['total']['value'] }, status=status.HTTP_200_OK)
+    return Response({ 'results': results.get('hits', []), 'total': results['total']['value'], 'page_size': PAGE_SIZE }, status=status.HTTP_200_OK)

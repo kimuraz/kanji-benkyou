@@ -1,16 +1,21 @@
 <template>
   <a-layout>
-    <a-layout-header>
       <a-menu
         mode="horizontal"
-        :selectedKeys="[routeName]"
+        :selectedKeys="[$route.name]"
         theme="dark"
-        :style="{ marginTop: '10px', width: 'fit-content', marginLeft: 'auto' }"
       >
         <a-menu-item key="Home">
           <router-link :to="{ name: 'Home' }">
             <home-outlined />
             Home
+          </router-link>
+        </a-menu-item>
+
+        <a-menu-item key="JLPT">
+          <router-link :to="{ name: 'JLPT' }">
+            <file-protect-outlined />
+            JLPT
           </router-link>
         </a-menu-item>
 
@@ -28,10 +33,9 @@
           </router-link>
         </a-menu-item>
       </a-menu>
-    </a-layout-header>
 
     <a-layout-content
-      :style="{ overflow: 'auto', minHeight: 'calc(100vh - 134px)' }"
+      :style="{ overflow: 'auto', minHeight: 'calc(100vh - 117px)' }"
     >
       <slot />
     </a-layout-content>
@@ -46,9 +50,9 @@
 
 <script>
 import { computed } from 'vue';
-import { useRouter } from 'vue-router';
 import {
   BookOutlined,
+  FileProtectOutlined,
   HomeOutlined,
   UserOutlined,
 } from '@ant-design/icons-vue';
@@ -57,17 +61,16 @@ import { useStore } from 'vuex';
 export default {
   name: 'Layout',
   components: {
+    BookOutlined,
+    FileProtectOutlined,
     HomeOutlined,
     UserOutlined,
-    BookOutlined,
   },
   setup() {
-    const { currentRoute } = useRouter();
     const store = useStore();
-    const routeName = computed(() => currentRoute.name);
     const user = computed(() => store.state.user);
 
-    return { routeName, user };
+    return { user };
   },
 };
 </script>

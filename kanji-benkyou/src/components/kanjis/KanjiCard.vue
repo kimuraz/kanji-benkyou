@@ -23,14 +23,14 @@
         <a-tag v-for="reading in kanji.kun_readings" :key="reading">
           {{ reading }}
         </a-tag>
-        <a-tag v-if="!kanji.kun_readings.length"> ? </a-tag>
+        <a-tag v-if="!kanji.kun_readings || !kanji.kun_readings.length"> ? </a-tag>
       </div>
       <div>
         <a-tag color="orange"> 音(おん):</a-tag>
         <a-tag v-for="reading in kanji.on_readings" :key="reading">
           {{ reading }}
         </a-tag>
-        <a-tag v-if="!kanji.on_readings.length"> ? </a-tag>
+        <a-tag v-if="!kanji.on_readings || !kanji.on_readings.length"> ? </a-tag>
       </div>
       <div>
         <a-tag color="volcano"> Meanings: </a-tag>
@@ -38,7 +38,7 @@
         <a-tag v-for="meaning in kanji.meanings" :key="meaning">
           <span class="meaning">{{ meaning }}</span>
         </a-tag>
-        <a-tag v-if="!kanji.meanings.length"> ? </a-tag>
+        <a-tag v-if="!kanji.meanings || !kanji.meanings.length"> ? </a-tag>
       </div>
     </div>
   </a-card>
@@ -77,7 +77,7 @@ export default {
 <style lang="scss" scoped>
 .kanji-card {
   margin: 10px;
-  width: 29vw;
+  width: 22vw;
   h1 {
     font-size: 5rem;
     text-align: center;

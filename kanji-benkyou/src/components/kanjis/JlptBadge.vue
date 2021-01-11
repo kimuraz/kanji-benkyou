@@ -1,17 +1,21 @@
 <template>
-  <a-tag class="jlpt-level" :color="color">
-    JLPT {{ level }} 
-  </a-tag>
+  <a-tag @click="$emit('click')" class="jlpt-level" :color="active ? color : 'grey'"> JLPT N{{ level }} </a-tag>
 </template>
 
 <script>
 import { computed } from 'vue';
 export default {
   name: 'JlptBadge',
+  emits: ['click'],
   props: {
     level: {
       type: Number,
       required: true,
+    },
+    active: {
+      type: Boolean,
+      required: false,
+      default: true,
     },
   },
   setup(props) {
@@ -20,7 +24,7 @@ export default {
 
     return {
       color,
-    }
+    };
   },
 };
 </script>
