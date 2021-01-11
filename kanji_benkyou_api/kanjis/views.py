@@ -11,11 +11,12 @@ from elasticsearch import Elasticsearch
 
 from rest_framework import status
 from rest_framework.decorators import api_view
-from rest_framework.response import Response 
+from rest_framework.response import Response
 
 logger = logging.getLogger(__name__)
 
 PAGE_SIZE = 50
+
 
 @api_view(['GET', 'POST'])
 def search_kanji(request):
@@ -23,15 +24,15 @@ def search_kanji(request):
     Search for kanjis on elasticsearch.
     """
     es = Elasticsearch([settings.ELASTIC_HOST])
-    page = request.query_params.get('page', '1') 
+    page = request.query_params.get('page', '1')
     search_param = {
         'from': PAGE_SIZE * (int(page) - 1 if page.isdecimal() and int(page) >= 1 else 0),
         'size': PAGE_SIZE,
         'sort': [
+            {'jlpt': {'order': 'desc'}},
             '_score',
             'grade',
-            { 'stroke_count': { 'order': 'asc' } },
-            'jlpt',
+            {'stroke_count': {'order': 'asc'}},
         ],
         'query': {}
     }
@@ -46,12 +47,13 @@ def search_kanji(request):
             'query': query if query else '*',
         }
 
-    results = es.search(index='kanjis', body=search_param, filter_path=['hits.total', 'hits.hits._id', 'hits.hits._source']).get('hits', {'hits': []})
+    results = es.search(index='kanjis', body=search_param, filter_path=[
+                        'hits.total', 'hits.hits._id', 'hits.hits._source']).get('hits', {'hits': []})
 
     if len(results) == 0:
         return Response(status=status.HTTP_404_NOT_FOUND)
 
-    return Response({ 'results': results.get('hits', []), 'total': results['total']['value'], 'page_size': PAGE_SIZE }, status=status.HTTP_200_OK)
+    return Response({'results': results.get('hits', []), 'total': results['total']['value'], 'page_size': PAGE_SIZE}, status=status.HTTP_200_OK)
 
 
 @api_view(['GET'])
@@ -60,7 +62,7 @@ def romaji_to_kana(request):
     Converts romaji in either katakana or hiragana.
     """
     word = request.query_params.get('word', '')[0:1000]
-    return Response({ 'hiragana': romkan.to_hiragana(word), 'katakana': romkan.to_katakana(word) }, status=status.HTTP_200_OK)
+    return Response({'hiragana': romkan.to_hiragana(word), 'katakana': romkan.to_katakana(word)}, status=status.HTTP_200_OK)
 
 
 @api_view(['GET'])
@@ -78,13 +80,14 @@ def kanji_order(request):
         try:
             with open(os.path.join(settings.BASE_DIR, 'kanjis/kanjivg/kanji/{}.svg'.format(code)), 'rb') as kvg:
                 kanji_b64 = base64.b64encode(kvg.read()).decode('utf-8')
-                return Response({ 'svg': 'data:image/svg+xml;base64,{}'.format(kanji_b64) }, status=status.HTTP_200_OK)
+                return Response({'svg': 'data:image/svg+xml;base64,{}'.format(kanji_b64)}, status=status.HTTP_200_OK)
         except FileNotFoundError as e:
             logger.error(e)
-            return Response({ 'error': 'Kanji not found' }, status=status.HTTP_404_NOT_FOUND)
+            return Response({'error': 'Kanji not found'}, status=status.HTTP_404_NOT_FOUND)
     except Exception as e:
         logger.error(e)
-        return Response({ 'error': str(e) }, status=status.HTTP_404_NOT_FOUND)
+        return Response({'error': str(e)}, status=status.HTTP_404_NOT_FOUND)
+
 
 @api_view(['GET'])
 def kanji_by_jlpt(request):
@@ -92,14 +95,14 @@ def kanji_by_jlpt(request):
     Retrieve kanjis by JLPT level
     """
     es = Elasticsearch([settings.ELASTIC_HOST])
-    page = request.query_params.get('page', '1') 
+    page = request.query_params.get('page', '1')
     jlpt = request.query_params.get('jlpt', '5')
     search_param = {
         'from': PAGE_SIZE * (int(page) - 1 if page.isdecimal() and int(page) >= 1 else 0),
         'size': PAGE_SIZE,
         'sort': [
             '_score',
-            { 'stroke_count': { 'order': 'asc' } },
+            {'stroke_count': {'order': 'asc'}},
         ],
         'query': {
             'match': {
@@ -108,9 +111,10 @@ def kanji_by_jlpt(request):
         }
     }
 
-    results = es.search(index='kanjis', body=search_param, filter_path=['hits.total', 'hits.hits._id', 'hits.hits._source']).get('hits', {'hits': []})
+    results = es.search(index='kanjis', body=search_param, filter_path=[
+                        'hits.total', 'hits.hits._id', 'hits.hits._source']).get('hits', {'hits': []})
 
     if len(results) == 0:
         return Response(status=status.HTTP_404_NOT_FOUND)
 
-    return Response({ 'results': results.get('hits', []), 'total': results['total']['value'], 'page_size': PAGE_SIZE }, status=status.HTTP_200_OK)
+    return Response({'results': results.get('hits', []), 'total': results['total']['value'], 'page_size': PAGE_SIZE}, status=status.HTTP_200_OK)
