@@ -25,7 +25,7 @@ def search_kanji(request):
     es = Elasticsearch([settings.ELASTIC_HOST])
     page = request.query_params.get('page', '1') 
     search_param = {
-        'from': PAGE_SIZE * (int(page) - 1 if page.isdecimal() and int(page) >= 1 else 1),
+        'from': PAGE_SIZE * (int(page) - 1 if page.isdecimal() and int(page) >= 1 else 0),
         'size': PAGE_SIZE,
         'sort': [
             '_score',
@@ -95,7 +95,7 @@ def kanji_by_jlpt(request):
     page = request.query_params.get('page', '1') 
     jlpt = request.query_params.get('jlpt', '5')
     search_param = {
-        'from': PAGE_SIZE * (int(page) - 1 if page.isdecimal() and int(page) >= 1 else 1),
+        'from': PAGE_SIZE * (int(page) - 1 if page.isdecimal() and int(page) >= 1 else 0),
         'size': PAGE_SIZE,
         'sort': [
             '_score',
