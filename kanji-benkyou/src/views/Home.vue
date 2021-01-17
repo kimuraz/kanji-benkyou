@@ -50,9 +50,9 @@ export default {
         state.loading = true;
         state.results = [];
         const { data } = await api.get(
-          `/kanjis/search?q=${state.q}&page=${page}`
+          `/kanjis?q=${state.q}&page=${page}`
         );
-        state.results = data.results.map((k) => ({ id: k._id, ...k._source }));
+        state.results = data.results;
       } catch (error) {
         if (error.response?.status !== 404) {
           notification.error({

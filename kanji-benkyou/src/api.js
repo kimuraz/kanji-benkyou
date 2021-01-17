@@ -7,7 +7,7 @@ const api = axios.create({
 api.interceptors.request.use(
   (config) => {
     const token = localStorage.getItem('accessToken');
-    const unauthPaths = ['/kanjis/search'];
+    const unauthPaths = ['/kanjis'];
     if (token && !unauthPaths.some(p => config.url.includes(p))) {
       Object.assign(config.headers, { Authorization: `Bearer ${token}` });
     }
