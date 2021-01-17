@@ -114,7 +114,7 @@ const store = createStore({
       try {
         context.state.loadingDecks = true;
         const { data } = await api.get('/decks/');
-        context.commit('setDecks', data);
+        context.commit('setDecks', data.results);
       } catch (err) {
         console.error(err);
       }
