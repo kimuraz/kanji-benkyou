@@ -1,5 +1,7 @@
 import axios from 'axios';
 
+export const PAGE_SIZE = 30;
+
 const api = axios.create({
   baseURL: process.env.VUE_APP_API_URL,
 });

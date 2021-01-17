@@ -10,42 +10,29 @@
       />
     </div>
 
-    <h3>Showing {{ kanjis.length }} out of {{ ttl }}</h3>
-
-    <!-- pageSize=1 is a hack for controlling correctly this component-->
-    <a-pagination
-      v-model:current="page"
-      :total="2"
-      :pageSize="1"
-      @change="(pg) => getKanjis(activeLevel, pg)"
+    <kanji-search-results
+      @page="pg => getKanjis(activeLevel, pg)"
+      :loading="loading"
+      :page="page"
+      :total="ttl"
+      :kanjis="kanjis"
     />
 
-    <div class="kanjis-list">
-      <a-spin size="large" v-if="loading" />
-      <kanji-card v-for="k in kanjis" :key="k.id" :kanji="k" />
-    </div>
-
-    <a-pagination
-      v-model:current="page"
-      :total="2"
-      :pageSize="1"
-      @change="(pg) => getKanjis(activeLevel, pg)"
-    />
   </div>
 </template>
 
 <script>
 import { reactive, toRefs, onMounted } from 'vue';
 import JlptBadge from '@/components/kanjis/JlptBadge';
-import KanjiCard from '@/components/kanjis/KanjiCard';
+import KanjiSearchResults from '@/components/kanjis/KanjiSearchResults';
 
-import api from '@/api';
+import api, { PAGE_SIZE } from '@/api';
 
 export default {
   name: 'FilteredJlpt',
   components: {
     JlptBadge,
-    KanjiCard,
+    KanjiSearchResults,
   },
   setup() {
     const state = reactive({
@@ -53,7 +40,6 @@ export default {
       page: 1,
       kanjis: [],
       ttl: 0,
-      maxPage: 1,
       loading: true,
     });
 
@@ -61,13 +47,12 @@ export default {
       state.kanjis = [];
       state.loading = true;
       const { data } = await api.get(
-        `/kanji_by_jlpt/?jlpt=${lvl}&page=${curPage}`
+        `/kanjis/?jlpt=${lvl}&offset=${PAGE_SIZE * (curPage - 1)}`
       );
       state.activeLevel = lvl;
       state.page = curPage;
-      state.kanjis = data.results.map((k) => ({ id: k._id, ...k._source }));
-      state.maxPage = Math.ceil(data.total / data.page_size);
-      state.ttl = data.total;
+      state.kanjis = data.results;
+      state.ttl = data.count;
       state.loading = false;
     };
 
@@ -89,13 +74,6 @@ export default {
     > span {
       cursor: pointer;
     }
-  }
-  .kanjis-list {
-    display: flex;
-    flex-wrap: wrap;
-    justify-content: space-around;
-    align-items: strech;
-    margin-left: -15px;
   }
 }
 </style>
