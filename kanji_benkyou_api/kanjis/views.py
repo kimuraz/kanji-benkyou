@@ -37,7 +37,7 @@ class KanjiViewSet(viewsets.ReadOnlyModelViewSet):
             search_matcher = SearchRank(vector, search)
             queryset = Kanji.objects.annotate(
                 matches=search_matcher
-            ).order_by('-matches', 'jlpt', 'stroke_count')
+            ).filter(matches__gte=0.03).order_by('-matches', 'jlpt', 'stroke_count')
 
         if jlpt:
             queryset = queryset.filter(jlpt=jlpt)
