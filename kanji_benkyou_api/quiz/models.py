@@ -11,8 +11,10 @@ class Deck(models.Model):
 
 
 class Flashcard(models.Model):
-    deck = models.ForeignKey(Deck, null=False, on_delete=models.CASCADE, related_name='cards')
-    kanji = models.ForeignKey(Kanji, null=False, blank=False, on_delete=models.CASCADE)
+    deck = models.ForeignKey(
+        Deck, null=False, on_delete=models.CASCADE, related_name='cards')
+    kanji = models.ForeignKey(
+        Kanji, null=False, blank=False, on_delete=models.CASCADE)
 
 
 class Quiz(models.Model):

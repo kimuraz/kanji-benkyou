@@ -6,54 +6,43 @@ import romkan
 
 from django.shortcuts import render
 from django.conf import settings
-
-from elasticsearch import Elasticsearch
+from django.contrib.postgres.search import SearchVector, SearchRank, SearchQuery
 
 from rest_framework import status
+from rest_framework import viewsets
+from rest_framework.permissions import AllowAny
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
 
+from kanjis.models import Kanji
+from kanjis.serializers import KanjiSerializer
+
 logger = logging.getLogger(__name__)
 
-PAGE_SIZE = 50
 
-
-@api_view(['GET', 'POST'])
-def search_kanji(request):
+class KanjiViewSet(viewsets.ReadOnlyModelViewSet):
     """
-    Search for kanjis on elasticsearch.
+    Readonly viewset for kanjis.
     """
-    es = Elasticsearch([settings.ELASTIC_HOST])
-    page = request.query_params.get('page', '1')
-    search_param = {
-        'from': PAGE_SIZE * (int(page) - 1 if page.isdecimal() and int(page) >= 1 else 0),
-        'size': PAGE_SIZE,
-        'sort': [
-            {'jlpt': {'order': 'desc'}},
-            '_score',
-            'grade',
-            {'stroke_count': {'order': 'asc'}},
-        ],
-        'query': {}
-    }
+    serializer_class = KanjiSerializer
 
-    if request.method == 'POST':
-        data = request.data
-        search_param['query']['match'] = data
-    elif request.method == 'GET':
-        query = request.query_params.get('q', '')
-        query = html.unescape(query)
-        search_param['query']['query_string'] = {
-            'query': query if query else '*',
-        }
+    def get_queryset(self):
+        queryset = Kanji.objects.all()
+        search = self.request.query_params.get('q', None)
+        jlpt = self.request.query_params.get('jlpt', None)
+        if search:
+            vector = SearchVector(
+                'meanings', 'kun_readings', 'on_readings', 'kanji')
+            search = SearchQuery(search)
+            search_matcher = SearchRank(vector, search)
+            queryset = Kanji.objects.annotate(
+                matches=search_matcher
+            ).order_by('-matches', 'jlpt', 'stroke_count')
 
-    results = es.search(index='kanjis', body=search_param, filter_path=[
-                        'hits.total', 'hits.hits._id', 'hits.hits._source']).get('hits', {'hits': []})
+        if jlpt:
+            queryset = queryset.filter(jlpt=jlpt)
 
-    if len(results) == 0:
-        return Response(status=status.HTTP_404_NOT_FOUND)
-
-    return Response({'results': results.get('hits', []), 'total': results['total']['value'], 'page_size': PAGE_SIZE}, status=status.HTTP_200_OK)
+        return queryset
 
 
 @api_view(['GET'])
@@ -87,34 +76,3 @@ def kanji_order(request):
     except Exception as e:
         logger.error(e)
         return Response({'error': str(e)}, status=status.HTTP_404_NOT_FOUND)
-
-
-@api_view(['GET'])
-def kanji_by_jlpt(request):
-    """
-    Retrieve kanjis by JLPT level
-    """
-    es = Elasticsearch([settings.ELASTIC_HOST])
-    page = request.query_params.get('page', '1')
-    jlpt = request.query_params.get('jlpt', '5')
-    search_param = {
-        'from': PAGE_SIZE * (int(page) - 1 if page.isdecimal() and int(page) >= 1 else 0),
-        'size': PAGE_SIZE,
-        'sort': [
-            '_score',
-            {'stroke_count': {'order': 'asc'}},
-        ],
-        'query': {
-            'match': {
-                'jlpt': (int(jlpt) if jlpt.isdecimal() else 5)
-            }
-        }
-    }
-
-    results = es.search(index='kanjis', body=search_param, filter_path=[
-                        'hits.total', 'hits.hits._id', 'hits.hits._source']).get('hits', {'hits': []})
-
-    if len(results) == 0:
-        return Response(status=status.HTTP_404_NOT_FOUND)
-
-    return Response({'results': results.get('hits', []), 'total': results['total']['value'], 'page_size': PAGE_SIZE}, status=status.HTTP_200_OK)
