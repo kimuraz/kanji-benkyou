@@ -160,6 +160,8 @@ AUTHENTICATION_BACKENDS = (
 # https://docs.djangoproject.com/en/3.1/howto/static-files/
 
 STATIC_URL = '/static/'
+STATIC_DIRS = ['/opt/static/']
+STATIC_ROOT = '/opt/static/'
 
 # OAuth
 SOCIAL_AUTH_GOOGLE_OAUTH2_KEY=env.str('SOCIAL_AUTH_GOOGLE_OAUTH2_KEY')
