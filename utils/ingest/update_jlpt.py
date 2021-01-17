@@ -2,7 +2,7 @@ import json
 
 with open('./jlpt_kanjis.json', 'r') as jf:
     jlpt = json.load(jf)
-    with open('./data.json', 'r') as dtf:
+    with open('../data.json', 'r') as dtf:
         data = json.load(dtf)
         new_data = { 'kanjis': {} }
         for k in data['kanjis']:
