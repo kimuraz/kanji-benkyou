@@ -161,7 +161,8 @@ AUTHENTICATION_BACKENDS = (
 
 STATIC_URL = '/static/'
 STATIC_DIRS = ['/opt/static/']
-STATIC_ROOT = '/opt/static/'
+MEDIA_URL = '/media/'
+MEDIA_ROOT = '/opt/static/'
 
 # OAuth
 SOCIAL_AUTH_GOOGLE_OAUTH2_KEY=env.str('SOCIAL_AUTH_GOOGLE_OAUTH2_KEY')

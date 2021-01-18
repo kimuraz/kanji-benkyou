@@ -17,6 +17,8 @@ from rest_framework.response import Response
 from kanjis.models import Kanji
 from kanjis.serializers import KanjiSerializer
 
+from kanjis.pdf.pdf_utils import generate_pdf
+
 logger = logging.getLogger(__name__)
 
 
@@ -63,7 +65,7 @@ def kanji_order(request):
         kanji = request.query_params.get('kanji', '')[0:10]
         kanji = html.unescape(kanji)
         if not kanji:
-            return Response({}, status=status.HTP_400_BAD_REQUEST)
+            return Response({}, status=status.HTTP_400_BAD_REQUEST)
         code = '%05x' % ord(kanji)
 
         try:
@@ -76,3 +78,21 @@ def kanji_order(request):
     except Exception as e:
         logger.error(e)
         return Response({'error': str(e)}, status=status.HTTP_404_NOT_FOUND)
+
+
+@api_view(['GET'])
+def kanji_pdf(request):
+    """
+    Searchs for kanji pdf or generate one.
+    """
+    try:
+        kanji = request.query_params.get('kanji', '')[0:10]
+        kanji = html.unescape(kanji)
+        if not kanji:
+            return Response({}, status=status.HTTP_400_BAD_REQUEST)
+        code = '%05x' % ord(kanji)
+        if not os.path.isfile(settings.MEDIA_ROOT + code + '.pdf'):
+            generate_pdf(code)
+        return Response({'url': '{}{}{}.pdf'.format(request.build_absolute_uri('/')[:-1], settings.MEDIA_URL, code)}, status=status.HTTP_200_OK)
+    except Exception as e:
+        return Response({'error': str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
