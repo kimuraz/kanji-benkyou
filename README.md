@@ -6,8 +6,8 @@ It uses the data from [kanjiapi.dev](https://kanjiapi.dev/)
 ## Features
 
 General:
-- [ ] Searching / filtering
-- [ ] PDF sheet generation
+- [x] Searching / filtering
+- [x] PDF sheet generation
 - [ ] Translations
 
 Per user:
@@ -17,8 +17,6 @@ Per user:
 - [ ] Quiz 
 
 ## Stack
-- [ ] Django + DRF 
-- [ ] PostgreSQL for users
-- [ ] Elasticsearch for kanji data
-- [ ] Vue3
-- [ ] TailwindCSS for styling
+- Django + DRF 
+- PostgreSQL for users
+- Vue3 + Ant Vue Design
