@@ -17,6 +17,7 @@ services:
       - ./kanji_benkyou_api/.env
     volumes:
       - ./kanji_benkyou_api:/opt/kanji-api:rw
+      - pdfdata:/opt/static:rw
     ports:
       - "8000:8000"
     depends_on:
@@ -35,3 +36,4 @@ services:
 
 volumes:
   pgdata:
+  pdfdata:
