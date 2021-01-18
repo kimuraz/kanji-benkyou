@@ -3,6 +3,7 @@ import os
 
 from django.conf import settings
 
+from PIL import Image
 from cairosvg import svg2png
 
 template = '{}/kanjis/pdf/template.pdf'.format(settings.BASE_DIR)
@@ -18,7 +19,11 @@ def generate_pdf(kanji_code):
 
         png_path = os.path.join(settings.BASE_DIR, 'kanjis/pdf/tmp/{}.png'.format(kanji_code))
         svg2png(url=image_path, write_to=png_path)
+        img = Image.open(png_path)
+        img = img.transpose(Image.FLIP_LEFT_RIGHT)
+        img.save(png_path)
         page.insertImage(img_rect, filename=png_path)
+        page.setRotation(180)
         file_handle.save('{}/{}.pdf'.format(settings.MEDIA_ROOT, kanji_code))
         os.remove(png_path)
     except Exception as e:
