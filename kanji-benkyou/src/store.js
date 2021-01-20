@@ -131,6 +131,13 @@ const store = createStore({
         });
       } catch (err) {
         console.error(err);
+        if (err.response?.data?.err === 'max_decks_per_user') {
+          notification.error({
+              message: 'Error',
+              description: 'Max number of decks reached, delete a deck to start a new one.',
+          });
+          throw err;
+        }
         notification.error({
             message: 'Error',
             description: 'Could not save this deck, please try again.',

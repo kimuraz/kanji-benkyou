@@ -27,7 +27,7 @@ class FlashcardViewSet(viewsets.ModelViewSet):
     permission_classes = [IsAuthenticated]
 
     def get_queryset(self):
-        return self.queryset.filter(user=self.request.user)
+        return self.queryset.filter(deck__user=self.request.user)
 
 
 class QuizViewSet(viewsets.ModelViewSet):
@@ -39,4 +39,4 @@ class QuizViewSet(viewsets.ModelViewSet):
     permission_classes = [IsAuthenticated]
 
     def get_queryset(self):
-        return self.queryset.filter(user=self.request.user)
+        return self.queryset.filter(deck__user=self.request.user)
