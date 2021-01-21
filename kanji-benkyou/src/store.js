@@ -25,6 +25,12 @@ const store = createStore({
     addDeck(state, deck) {
       state.decks.push(deck);
     },
+    removeDeck(state, id) {
+      state.decks.splice(
+        state.decks.findIndex((d) => d.id === id),
+        1
+      );
+    },
   },
   // TODO: Separate newTOkena and refresh toke methods!
   actions: {
@@ -100,7 +106,8 @@ const store = createStore({
             client_id: process.env.VUE_APP_DJANGO_GOOGLE_APP_ID,
             client_secret: process.env.VUE_APP_DJANGO_GOOGLE_APP_SECRET,
             backend: 'google-oauth2',
-            token: Object.values(gRes).find(v => !!v.access_token).access_token,
+            token: Object.values(gRes).find((v) => !!v.access_token)
+              .access_token,
           });
 
           context.dispatch('getDecks');
@@ -133,16 +140,30 @@ const store = createStore({
         console.error(err);
         if (err.response?.data?.err === 'max_decks_per_user') {
           notification.error({
-              message: 'Error',
-              description: 'Max number of decks reached, delete a deck to start a new one.',
+            message: 'Error',
+            description:
+              'Max number of decks reached, delete a deck to start a new one.',
           });
           throw err;
         }
         notification.error({
-            message: 'Error',
-            description: 'Could not save this deck, please try again.',
+          message: 'Error',
+          description: 'Could not save this deck, please try again.',
         });
         throw err;
+      }
+    },
+    async deleteDeck({ commit }, id) {
+      try {
+        await api.delete(`/decks/${id}`);
+        commit('removeDeck', id);
+      } catch (err) {
+        console.error(err);
+        notification.error({
+          message: 'Error',
+          description:
+            'An error occurred whie deleting this deck, please try again.',
+        });
       }
     },
   },

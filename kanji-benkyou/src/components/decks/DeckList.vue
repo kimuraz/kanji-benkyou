@@ -15,11 +15,7 @@
                 <edit-outlined />
               </template>
             </a-button>
-            <a-button
-              @click="emitEvt('delete', item.id)"
-              shape="round"
-              type="danger"
-            >
+            <a-button @click="deleteDeck(item.id)" shape="round" type="danger">
               <template #icon>
                 <delete-outlined />
               </template>
@@ -39,6 +35,7 @@
 import { computed, onMounted } from 'vue';
 import { useStore } from 'vuex';
 import { EditOutlined, DeleteOutlined } from '@ant-design/icons-vue';
+import { Modal } from 'ant-design-vue';
 
 export default {
   name: 'DeckList',
@@ -60,7 +57,23 @@ export default {
       emit(evt, id);
     };
 
-    return { loading, decks, emitEvt };
+    const deleteDeck = (id) => {
+      Modal.confirm({
+        title: 'Do you really want to delete this deck?',
+        okText: 'Yes',
+        okType: 'danger',
+        cancelText: 'No',
+        onOk: () => store.dispatch('deleteDeck', id),
+        onCancel: () => {},
+      });
+    };
+
+    return {
+      loading,
+      decks,
+      emitEvt,
+      deleteDeck,
+    };
   },
 };
 </script>
