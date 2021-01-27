@@ -10,9 +10,7 @@ api.interceptors.request.use(
   (config) => {
     const token = localStorage.getItem('accessToken');
     const unauthPaths = ['/kanjis'];
-    console.log(unauthPaths.some(p => config.url.includes(p)), config.url)
     if (token && !unauthPaths.some(p => config.url.includes(p))) {
-      console.log('here')
       Object.assign(config.headers, { Authorization: `Bearer ${token}` });
     }
     return config;

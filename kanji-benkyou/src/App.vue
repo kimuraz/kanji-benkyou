@@ -13,8 +13,8 @@ export default {
     Layout,
   },
   mounted() {
-    if (!this.user?.token && localStorage.getItem('refreshToken')) {
-      this.$store.dispatch('getToken', { refresh: true });
+    if (localStorage.getItem('refreshToken')) {
+      this.$store.dispatch('getProfile');
     }
   }
 };

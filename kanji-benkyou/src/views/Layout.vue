@@ -19,14 +19,14 @@
           </router-link>
         </a-menu-item>
 
-        <a-menu-item key="Decks" v-if="user.token">
+        <a-menu-item key="Decks" v-if="user.isLogged">
           <router-link :to="{ name: 'Decks' }">
             <book-outlined />
             Decks
           </router-link>
         </a-menu-item>
 
-        <a-menu-item key="Login" v-if="!user.token">
+        <a-menu-item key="Login" v-if="!user.isLogged">
           <router-link :to="{ name: 'Login' }">
             <user-outlined />
             Login

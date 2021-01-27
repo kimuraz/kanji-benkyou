@@ -6,9 +6,11 @@ const store = createStore({
   state() {
     return {
       user: {
-        name: '',
+        username: '',
+        first_name: '',
+        last_name: '',
         email: '',
-        token: '',
+        isLogged: false,
       },
       decks: [],
       loadingDecks: false,
@@ -25,6 +27,13 @@ const store = createStore({
     addDeck(state, deck) {
       state.decks.push(deck);
     },
+    editDeck(state, deck) {
+      state.decks.splice(
+        state.decks.findIndex((d) => d.id === deck.id),
+        1,
+        { ...deck }
+      );
+    },
     removeDeck(state, id) {
       state.decks.splice(
         state.decks.findIndex((d) => d.id === id),
@@ -32,18 +41,36 @@ const store = createStore({
       );
     },
   },
-  // TODO: Separate newTOkena and refresh toke methods!
   actions: {
+    async getProfile({ dispatch, commit }) {
+      try {
+        const refresh = localStorage.getItem('refreshType');
+        if (refresh) {
+          dispatch(refresh);
+        }
+        const { data } = await api.get('/profile/');
+        commit('setUser', { ...data, isLogged: true });
+      } catch (err) {
+        if (err.reponse?.status === 401) {
+          window.location = '/login';
+        } else {
+          console.error(err);
+          notification.error({
+            message: 'Error',
+            description: err.message,
+          });
+        }
+      }
+    },
     async getToken(
       context,
       { client_id, grant_type, client_secret, backend, token, refresh }
     ) {
-      const refreshToken = localStorage.getItem('refreshToken');
       const tokenLabel = refresh ? 'refresh_token' : 'token';
       localStorage.removeItem('accessToken');
       localStorage.removeItem('refreshToken');
 
-      if (!refreshToken && refresh) {
+      if (!token && refresh) {
         window.location = '/login';
         return;
       }
@@ -56,7 +83,7 @@ const store = createStore({
             client_id,
             client_secret,
             backend,
-            [tokenLabel]: refresh ? refreshToken : token,
+            [tokenLabel]: token,
           }
         );
         localStorage.setItem('accessToken', data.access_token);
@@ -88,6 +115,15 @@ const store = createStore({
         }
       }
     },
+    async gRefresh({ dispatch }) {
+      await dispatch('getToken', {
+        client_id: process.env.VUE_APP_GOOGLE_CLIENT_ID,
+        client_secret: process.env.VUE_APP_DJANGO_GOOGLE_APP_SECRET,
+        backend: 'google-oauth2',
+        token: localStorage.getItem('refreshToken'),
+        refresh: true,
+      });
+    },
     gLogin(context) {
       window.gapi.load('client:auth2', async () => {
         try {
@@ -110,6 +146,7 @@ const store = createStore({
               .access_token,
           });
 
+          localStorage.setItem('refreshType', 'gRefresh');
           context.dispatch('getDecks');
         } catch (err) {
           console.error(err);
@@ -151,6 +188,19 @@ const store = createStore({
           description: 'Could not save this deck, please try again.',
         });
         throw err;
+      }
+    },
+    async edit({ commit }, deck) {
+      try {
+        const { data } = await api.patch(`/decks/${deck.id}`, deck);
+        commit('editDeck', data);
+      } catch (err) {
+        console.error(err);
+        notification.error({
+          message: 'Error',
+          description:
+            'An error occurred whie deleting this deck, please try again.',
+        });
       }
     },
     async deleteDeck({ commit }, id) {
