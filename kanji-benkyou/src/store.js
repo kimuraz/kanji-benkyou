@@ -1,6 +1,7 @@
 import { createStore } from 'vuex';
 import api from './api';
 import { notification } from 'ant-design-vue';
+import router from './router';
 
 const store = createStore({
   state() {
@@ -15,6 +16,9 @@ const store = createStore({
       decks: [],
       loadingDecks: false,
     };
+  },
+  getters: {
+    isLogged: (state) => state.user.isLogged,
   },
   mutations: {
     setUser(state, user) {
@@ -42,17 +46,13 @@ const store = createStore({
     },
   },
   actions: {
-    async getProfile({ dispatch, commit }) {
+    async getProfile({ commit }) {
       try {
-        const refresh = localStorage.getItem('refreshType');
-        if (refresh) {
-          dispatch(refresh);
-        }
         const { data } = await api.get('/profile/');
         commit('setUser', { ...data, isLogged: true });
       } catch (err) {
-        if (err.reponse?.status === 401) {
-          window.location = '/login';
+        if (err.response?.status === 401) {
+          router.push({ name: 'Login' });
         } else {
           console.error(err);
           notification.error({
@@ -63,7 +63,7 @@ const store = createStore({
       }
     },
     async getToken(
-      context,
+      { dispatch },
       { client_id, grant_type, client_secret, backend, token, refresh }
     ) {
       const tokenLabel = refresh ? 'refresh_token' : 'token';
@@ -71,7 +71,7 @@ const store = createStore({
       localStorage.removeItem('refreshToken');
 
       if (!token && refresh) {
-        window.location = '/login';
+        router.push({ name: 'Login' });
         return;
       }
 
@@ -88,24 +88,12 @@ const store = createStore({
         );
         localStorage.setItem('accessToken', data.access_token);
         localStorage.setItem('refreshToken', data.refresh_token);
-        context.commit('setUser', {
-          name: '',
-          email: '',
-          token: data.access_token,
-        });
         setTimeout(() => {
-          context.dispatch('getToken', {
-            client_id,
-            grant_type: 'refresh_token',
-            client_secret,
-            backend,
-            token: null,
-            refresh: true,
-          });
+          dispatch('gRefresh');
         }, data.expires_in);
       } catch (err) {
         if (refresh && err.reponse?.status === 401) {
-          window.location = '/login';
+          router.push({ name: 'Login' });
         } else {
           console.error(err);
           notification.error({
@@ -117,14 +105,15 @@ const store = createStore({
     },
     async gRefresh({ dispatch }) {
       await dispatch('getToken', {
-        client_id: process.env.VUE_APP_GOOGLE_CLIENT_ID,
+        client_id: process.env.VUE_APP_DJANGO_GOOGLE_APP_ID,
         client_secret: process.env.VUE_APP_DJANGO_GOOGLE_APP_SECRET,
         backend: 'google-oauth2',
+        grant_type: 'refresh_token',
         token: localStorage.getItem('refreshToken'),
         refresh: true,
       });
     },
-    gLogin(context) {
+    gLogin({ dispatch }) {
       window.gapi.load('client:auth2', async () => {
         try {
           await window.gapi.client.init({
@@ -136,7 +125,7 @@ const store = createStore({
 
           const gRes = await window.gapi.auth2.getAuthInstance().signIn();
 
-          await context.dispatch('getToken', {
+          await dispatch('getToken', {
             grant_type: 'convert_token',
             // Generated on django admin
             client_id: process.env.VUE_APP_DJANGO_GOOGLE_APP_ID,
@@ -147,27 +136,29 @@ const store = createStore({
           });
 
           localStorage.setItem('refreshType', 'gRefresh');
-          context.dispatch('getDecks');
+          dispatch('getProfile');
+          dispatch('getDecks');
+          router.replace({ name: 'Home' });
         } catch (err) {
           console.error(err);
         }
       });
     },
 
-    async getDecks(context) {
+    async getDecks({ commit, state }) {
       try {
-        context.state.loadingDecks = true;
+        state.loadingDecks = true;
         const { data } = await api.get('/decks/');
-        context.commit('setDecks', data.results);
+        commit('setDecks', data.results);
       } catch (err) {
         console.error(err);
       }
     },
 
-    async newDeck(context, deck) {
+    async newDeck({ commit }, deck) {
       try {
         const { data } = await api.post('/decks/', deck);
-        context.commit('addDeck', data);
+        commit('addDeck', data);
         console.log(data);
         notification.success({
           message: 'Deck saved!',

@@ -12,16 +12,25 @@ export default {
   components: {
     Layout,
   },
-  mounted() {
+  async mounted() {
     if (localStorage.getItem('refreshToken')) {
-      this.$store.dispatch('getProfile');
+      try {
+        await this.$store.dispatch(localStorage.getItem('refreshType'));
+        this.$nextTick(() => {
+          this.$store.dispatch('getProfile');
+          this.$route.name === 'Login' && this.$router.push({ name: 'Home' });
+        });
+      } catch (err) {
+        return;
+      }
     }
-  }
+  },
 };
 </script>
 
 <style>
-html, body {
+html,
+body {
   margin: 0;
   padding: 0;
 }
