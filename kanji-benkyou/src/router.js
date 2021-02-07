@@ -4,6 +4,7 @@ import store from './store';
 import Home from '@/views/Home';
 import Login from '@/views/Login';
 import Decks from '@/views/Decks';
+import DeckDetail from '@/views/DeckDetail';
 import FilteredJlpt from '@/views/FilteredJlpt';
 
 const routes = [
@@ -21,6 +22,11 @@ const routes = [
     path: '/decks',
     name: 'Decks',
     component: Decks,
+  },
+  {
+    path: '/decks/:id',
+    name: 'DeckDetail',
+    component: DeckDetail,
   },
   {
     path: '/jlpt',

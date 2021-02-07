@@ -1,6 +1,6 @@
 <template>
   <Layout>
-    <router-view />
+    <router-view v-if="!loading" />
   </Layout>
 </template>
 
@@ -12,6 +12,11 @@ export default {
   components: {
     Layout,
   },
+  data() {
+    return {
+      loading: true,
+    };
+  },
   async mounted() {
     if (localStorage.getItem('refreshToken')) {
       try {
@@ -22,6 +27,8 @@ export default {
         });
       } catch (err) {
         return;
+      } finally {
+        this.loading = false;
       }
     }
   },
