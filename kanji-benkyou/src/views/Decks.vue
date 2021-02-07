@@ -40,5 +40,10 @@ export default {
 <style lang="scss">
 #decks {
   padding: 20px;
+  width: 60vw;
+}
+
+@media screen and (max-width: 812px) {
+  width: 100vw;
 }
 </style>
