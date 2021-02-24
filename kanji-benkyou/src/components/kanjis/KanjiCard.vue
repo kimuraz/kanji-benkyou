@@ -105,7 +105,7 @@ export default {
       generatingPDF.value = true;
       try {
         const { data } = await api.get(
-          `/kanji_pdf/?kanji=${props.kanji.kanji}`
+          `/kanji_pdf/?kanji_id=${props.kanji.id}`
         );
         pdfURL.value = data.url;
         setTimeout(() => {

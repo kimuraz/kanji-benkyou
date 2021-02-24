@@ -3,8 +3,9 @@ import html
 import logging
 import os
 import romkan
+import urllib
 
-from django.shortcuts import render
+from django.shortcuts import render, get_object_or_404
 from django.conf import settings
 from django.contrib.postgres.search import SearchVector, SearchRank, SearchQuery
 
@@ -86,13 +87,20 @@ def kanji_pdf(request):
     Searchs for kanji pdf or generate one.
     """
     try:
-        kanji = request.query_params.get('kanji', '')[0:10]
-        kanji = html.unescape(kanji)
-        if not kanji:
-            return Response({}, status=status.HTTP_400_BAD_REQUEST)
-        code = '%05x' % ord(kanji)
+        kanji_id = request.query_params.get('kanji_id', '')[0:10]
+        try:
+            kanji = Kanji.objects.get(pk=kanji_id)
+        except Kanji.DoesNotExist:
+            logger.error(e)
+            return Response({'error': 'Kanji not found'}, status=status.HTTP_404_NOT_FOUND)
+
+        code = '%05x' % ord(kanji.kanji)
         if not os.path.isfile(settings.MEDIA_ROOT + code + '.pdf'):
-            generate_pdf(code)
+            generate_pdf(code, kanji)
         return Response({'url': '{}{}{}.pdf'.format(request.build_absolute_uri('/')[:-1], settings.MEDIA_URL, code)}, status=status.HTTP_200_OK)
+    except urllib.error.URLError as e: 
+        logger.error(e)
+        return Response({'error': 'Kanji not found'}, status=status.HTTP_404_NOT_FOUND)
     except Exception as e:
+        logger.error(e)
         return Response({'error': str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
