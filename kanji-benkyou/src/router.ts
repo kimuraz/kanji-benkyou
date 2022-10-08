@@ -1,10 +1,10 @@
 import { createWebHistory, createRouter } from 'vue-router';
 import store from './store';
 
-import Home from '@/views/Home';
-import Login from '@/views/Login';
-import Decks from '@/views/Decks';
-import FilteredJlpt from '@/views/FilteredJlpt';
+import Home from '@/views/Home.vue';
+import Login from '@/views/Login.vue';
+import Decks from '@/views/Decks.vue';
+import FilteredJlpt from '@/views/FilteredJlpt.vue';
 
 const routes = [
   {

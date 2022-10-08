@@ -26,13 +26,14 @@ services:
 
   app:
     build: ./kanji-benkyou
+    user: "${UID}:${GID}"
     env_file:
       - ./kanji-benkyou/.env
     volumes:
       - ./kanji-benkyou:/opt/kanji-app:rw
     ports:
-      - "8080:8080"
-    command: ["yarn", "serve"]
+      - "5173:5173"
+    command: ["npm", "run", "dev", "--host", "0.0.0.0"]
 
 volumes:
   pgdata:

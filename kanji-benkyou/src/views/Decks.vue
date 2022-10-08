@@ -19,8 +19,8 @@ import { ref } from 'vue';
 
 import { PlusOutlined } from '@ant-design/icons-vue';
 
-import DeckForm from '@/components/decks/DeckForm';
-import DeckList from '@/components/decks/DeckList';
+import DeckForm from '@/components/decks/DeckForm.vue';
+import DeckList from '@/components/decks/DeckList.vue';
 
 export default {
   name: 'Decks',
@@ -44,6 +44,8 @@ export default {
 }
 
 @media screen and (max-width: 812px) {
-  width: 100vw;
+  #decks {
+    width: 100vw;
+  }
 }
 </style>

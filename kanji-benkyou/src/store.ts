@@ -105,8 +105,8 @@ const store = createStore({
     },
     async gRefresh({ dispatch }) {
       await dispatch('getToken', {
-        client_id: process.env.VUE_APP_DJANGO_GOOGLE_APP_ID,
-        client_secret: process.env.VUE_APP_DJANGO_GOOGLE_APP_SECRET,
+        client_id: import.meta.env.VITE_APP_DJANGO_GOOGLE_APP_ID,
+        client_secret: import.meta.env.VITE_APP_DJANGO_GOOGLE_APP_SECRET,
         backend: 'google-oauth2',
         grant_type: 'refresh_token',
         token: localStorage.getItem('refreshToken'),
@@ -117,8 +117,8 @@ const store = createStore({
       window.gapi.load('client:auth2', async () => {
         try {
           await window.gapi.client.init({
-            apiKey: process.env.VUE_APP_GOOGLE_API_KEY,
-            clientId: process.env.VUE_APP_GOOGLE_CLIENT_ID,
+            apiKey: import.meta.env.VITE_APP_GOOGLE_API_KEY,
+            clientId: import.meta.env.VITE_APP_GOOGLE_CLIENT_ID,
             scope:
               'https://www.googleapis.com/auth/userinfo.email https://www.googleapis.com/auth/userinfo.profile openid',
           });
@@ -128,8 +128,8 @@ const store = createStore({
           await dispatch('getToken', {
             grant_type: 'convert_token',
             // Generated on django admin
-            client_id: process.env.VUE_APP_DJANGO_GOOGLE_APP_ID,
-            client_secret: process.env.VUE_APP_DJANGO_GOOGLE_APP_SECRET,
+            client_id: import.meta.env.VITE_APP_DJANGO_GOOGLE_APP_ID,
+            client_secret: import.meta.env.VITE_APP_DJANGO_GOOGLE_APP_SECRET,
             backend: 'google-oauth2',
             token: Object.values(gRes).find((v) => !!v.access_token)
               .access_token,

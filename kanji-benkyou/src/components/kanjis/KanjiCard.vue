@@ -80,8 +80,8 @@ import { ref } from 'vue';
 import { notification } from 'ant-design-vue';
 import { InfoCircleOutlined, DownloadOutlined } from '@ant-design/icons-vue';
 
-import JlptBadge from './JlptBadge';
-import OrderModal from './OrderModal';
+import JlptBadge from './JlptBadge.vue';
+import OrderModal from './OrderModal.vue';
 
 import api from '@/api';
 

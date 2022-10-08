@@ -30,7 +30,7 @@ import { notification } from 'ant-design-vue';
 
 import api, { PAGE_SIZE } from '@/api';
 
-import KanjiSearchResults from '@/components/kanjis/KanjiSearchResults';
+import KanjiSearchResults from '@/components/kanjis/KanjiSearchResults.vue';
 
 export default {
   name: 'Home',
